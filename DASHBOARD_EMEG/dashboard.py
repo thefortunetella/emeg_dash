@@ -4,6 +4,7 @@ import plotly.figure_factory as ff
 import matplotlib.pyplot as plt
 import pandas as pd
 import warnings
+
 warnings.filterwarnings('ignore')
 
 # Configuração inicial do Streamlit
@@ -298,3 +299,4 @@ st.plotly_chart(data1, use_container_width=True)
 # Download de dados originais
 csv = df.to_csv(index=False).encode('utf-8')
 st.download_button('Baixar Dados', data=csv, file_name="Dados.csv", mime='text/csv')
+
