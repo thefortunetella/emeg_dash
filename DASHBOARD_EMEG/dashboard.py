@@ -7,7 +7,7 @@ import warnings
 warnings.filterwarnings('ignore')
 
 # Configuração inicial do Streamlit
-st.set_page_config(page_title="Dashboard de Vendas", page_icon=":bar_chart:", layout="wide")
+st.set_page_config(page_title="Dashboard de Vendas", page_icon=":bar_chart:", layout="wide", initial_sidebar_state="expanded")
 
 st.title(" :bar_chart: Dashboard de Vendas")
 st.markdown('<style>div.block-container{padding-top:1rem;}</style>', unsafe_allow_html=True)
