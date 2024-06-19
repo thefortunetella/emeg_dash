@@ -296,7 +296,48 @@ data1.update_layout(
 )
 st.plotly_chart(data1, use_container_width=True)
 
+# Gráficos adicionais de comparação de porcentagens e crescimento
+
+# Crescimento Percentual de Receita e Peso
+st.subheader("Crescimento Percentual de Receita e Peso")
+growth_percentage_df = df_filtered.groupby(['Ano', 'Mês'], as_index=False).agg({"RECEITA": "sum", "PESO": "sum"})
+growth_percentage_df['Receita_Percentual'] = growth_percentage_df['RECEITA'].pct_change().fillna(0) * 100
+growth_percentage_df['Peso_Percentual'] = growth_percentage_df['PESO'].pct_change().fillna(0) * 100
+fig_growth_percentage = px.line(growth_percentage_df, x='Mês', y=['Receita_Percentual', 'Peso_Percentual'], color='Ano', 
+                                labels={"value": "Crescimento Percentual", "variable": "Métrica"}, title="Crescimento Percentual de Receita e Peso", template="plotly_dark", color_discrete_sequence=px.colors.sequential.Plasma)
+fig_growth_percentage.update_layout(
+    plot_bgcolor='rgba(0, 0, 0, 0)',
+    paper_bgcolor='rgba(0, 0, 0, 0)',
+)
+st.plotly_chart(fig_growth_percentage, use_container_width=True)
+
+# Comparação de Crescimento de Peso por Cliente ao Longo dos Anos
+st.subheader("Comparação de Crescimento de Peso por Cliente ao Longo dos Anos")
+client_weight_growth_df = df_filtered.groupby(['CLIENTE', 'Ano'], as_index=False).agg({"PESO": "sum"})
+fig_client_weight_growth = px.line(client_weight_growth_df, x='Ano', y='PESO', color='CLIENTE', 
+                                   labels={"PESO": "Peso Total", "Ano": "Ano", "CLIENTE": "Cliente"},
+                                   title="Comparação de Crescimento de Peso por Cliente ao Longo dos Anos", template="plotly_dark", color_discrete_sequence=px.colors.sequential.Plasma)
+fig_client_weight_growth.update_layout(
+    plot_bgcolor='rgba(0, 0, 0, 0)',
+    paper_bgcolor='rgba(0, 0, 0, 0)',
+)
+st.plotly_chart(fig_client_weight_growth, use_container_width=True)
+
+# Crescimento Percentual de Receita por Cliente
+st.subheader("Crescimento Percentual de Receita por Cliente")
+client_revenue_growth_df = df_filtered.groupby(['CLIENTE', 'Ano'], as_index=False).agg({"RECEITA": "sum"})
+client_revenue_growth_df['Receita_Percentual'] = client_revenue_growth_df.groupby('CLIENTE')['RECEITA'].pct_change().fillna(0) * 100
+fig_client_revenue_growth = px.line(client_revenue_growth_df, x='Ano', y='Receita_Percentual', color='CLIENTE', 
+                                    labels={"Receita_Percentual": "Crescimento Percentual de Receita", "Ano": "Ano", "CLIENTE": "Cliente"},
+                                    title="Crescimento Percentual de Receita por Cliente", template="plotly_dark", color_discrete_sequence=px.colors.sequential.Plasma)
+fig_client_revenue_growth.update_layout(
+    plot_bgcolor='rgba(0, 0, 0, 0)',
+    paper_bgcolor='rgba(0, 0, 0, 0)',
+)
+st.plotly_chart(fig_client_revenue_growth, use_container_width=True)
+
 # Download de dados originais
 csv = df.to_csv(index=False).encode('utf-8')
 st.download_button('Baixar Dados', data=csv, file_name="Dados.csv", mime='text/csv')
+
 
