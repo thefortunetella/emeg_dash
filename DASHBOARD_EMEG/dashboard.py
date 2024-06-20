@@ -134,6 +134,39 @@ kpi1.metric(label="RECEITA TOTAL", value=f"R$ {total_revenue:,.2f}")
 kpi2.metric(label="PESO TOTAL TRANSPORTADO", value=f"{total_weight:,.2f} kg")
 kpi3.metric(label="TOTAL DE CLIENTES", value=total_customers)
 
+# Gráficos de crescimento do faturamento e participação
+st.markdown("### GRÁFICOS DE CRESCIMENTO DO FATURAMENTO E PARTICIPAÇÃO")
+
+# Cálculo do crescimento do faturamento por ano
+annual_revenue = df_filtered.groupby('Ano')['RECEITA'].sum().reset_index()
+annual_revenue['Crescimento'] = annual_revenue['RECEITA'].pct_change().fillna(0) * 100
+
+# Gráfico de barras para crescimento do faturamento
+fig_growth = px.bar(annual_revenue, x='Ano', y='Crescimento', text=annual_revenue['Crescimento'].apply(lambda x: f'{x:.2f}%'),
+                    title='Crescimento do Faturamento por Ano', labels={'Crescimento': 'Crescimento (%)'},
+                    template="plotly_dark", color_discrete_sequence=px.colors.sequential.Plasma)
+fig_growth.update_layout(
+    plot_bgcolor='rgba(0, 0, 0, 0)',
+    paper_bgcolor='rgba(0, 0, 0, 0)',
+    font=dict(color="white"),
+    title_font=dict(size=24, color="white"),
+    xaxis=dict(title_font=dict(size=18, color="white"), tickfont=dict(size=12, color="white")),
+    yaxis=dict(title_font=dict(size=18, color="white"), tickfont=dict(size=12, color="white"))
+)
+st.plotly_chart(fig_growth, use_container_width=True)
+
+# Gráfico de pizza para participação de cada ano na receita total
+fig_pie = px.pie(annual_revenue, values='RECEITA', names='Ano', title='Participação na Receita Total por Ano',
+                 template="plotly_dark", color_discrete_sequence=px.colors.sequential.Plasma)
+fig_pie.update_layout(
+    plot_bgcolor='rgba(0, 0, 0, 0)',
+    paper_bgcolor='rgba(0, 0, 0, 0)',
+    font=dict(color="white"),
+    title_font=dict(size=24, color="white"),
+    legend=dict(font=dict(size=12, color="white"))
+)
+st.plotly_chart(fig_pie, use_container_width=True)
+
 # Gráficos e tabelas
 col1, col2 = st.columns((2))
 
