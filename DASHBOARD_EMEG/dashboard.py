@@ -135,13 +135,13 @@ kpi2.metric(label="PESO TOTAL TRANSPORTADO", value=f"{total_weight:,.2f} kg")
 kpi3.metric(label="TOTAL DE CLIENTES", value=total_customers)
 
 # KPIs adicionais
-
+st.markdown("### KPIS ADICIONAIS")
 col1, col2, col3 = st.columns(3)
 
 # Variação percentual da receita
 df_filtered['Receita_Anterior'] = df_filtered['RECEITA'].shift(1)
 df_filtered['Variação_Receita'] = ((df_filtered['RECEITA'] - df_filtered['Receita_Anterior']) / df_filtered['Receita_Anterior']) * 100
-avg_revenue_variation = df_filtered['Variação_Receita'].mean()
+avg_revenue_variation = df_filtered['Variação_Receita'].mean(skipna=True)
 col1.metric(label="VARIAÇÃO PERCENTUAL DA RECEITA", value=f"{avg_revenue_variation:.2f}%")
 
 # Média de Peso por Transporte
@@ -149,9 +149,9 @@ avg_weight_per_transport = df_filtered['PESO'].mean()
 col2.metric(label="MÉDIA DE PESO POR TRANSPORTE", value=f"{avg_weight_per_transport:.2f} kg")
 
 # Porcentagem de clientes retidos ao longo dos anos
-retained_customers = df_filtered.groupby('Ano')['CLIENTE'].nunique().pct_change().fillna(0) * 100
-avg_retained_customers = retained_customers.mean()
-col3.metric(label="PORCENTAGEM DE CLIENTES RETIDOS", value=f"{avg_retained_customers:.2f}%")
+clientes_frequentes_sazonais = df_filtered[df_filtered['Perfil Cliente'].isin(['frequente', 'sazonal'])]
+clientes_retidos = clientes_frequentes_sazonais['CLIENTE'].nunique() / df_filtered['CLIENTE'].nunique() * 100
+col3.metric(label="PORCENTAGEM DE CLIENTES RETIDOS", value=f"{clientes_retidos:.2f}%")
 
 # Gráficos e tabelas
 col1, col2 = st.columns((2))
@@ -312,8 +312,7 @@ st.plotly_chart(fig, use_container_width=True)
 st.subheader("HEATMAP DE RECEITA AO LONGO DO TEMPO")
 heatmap_df = df_filtered.pivot_table(values='RECEITA', index=df_filtered['Data'].dt.year, columns=df_filtered['Data'].dt.month, aggfunc='sum', fill_value=0)
 fig_heatmap = px.imshow(heatmap_df, labels={'color': 'Receita'}, x=['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-                        y=heatmap_df.index, title='HEATMAP DE RECEITA POR MÊS E ANO', template="plotly_dark", color_continuous_scale=px.colors.sequential.Plasma
-                       )
+                        y=heatmap_df.index, title='HEATMAP DE RECEITA POR MÊS E ANO', template="plotly_dark", color_continuous_scale=px.colors.sequential.Plasma)
 fig_heatmap.update_layout(
     plot_bgcolor='rgba(0, 0, 0, 0)',
     paper_bgcolor='rgba(0, 0, 0, 0)',
@@ -361,5 +360,6 @@ st.plotly_chart(data1, use_container_width=True)
 # Download de dados originais
 csv = df.to_csv(index=False).encode('utf-8')
 st.download_button('Baixar Dados', data=csv, file_name="Dados.csv", mime='text/csv')
+
 
 
