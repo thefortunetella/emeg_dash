@@ -139,7 +139,8 @@ st.markdown("### KPIS ADICIONAIS")
 col1, col2, col3 = st.columns(3)
 
 # Variação percentual da receita anual
-annual_revenue_variation = df_filtered.groupby('Ano')['RECEITA'].sum().pct_change().fillna(0).iloc[-1] * 100
+annual_revenue = df_filtered.groupby('Ano')['RECEITA'].sum()
+annual_revenue_variation = annual_revenue.pct_change().fillna(0).iloc[-1] * 100
 col1.metric(label="VARIAÇÃO PERCENTUAL DA RECEITA", value=f"{annual_revenue_variation:.2f}%")
 
 # Média de Peso por Transporte
@@ -240,8 +241,6 @@ fig_comparison.update_layout(
     paper_bgcolor='rgba(0, 0, 0, 0)',
     font=dict(color="white"),
     title_font=dict(size=24, color="white"),
-    xaxis=dict
-        title_font=dict(size=24, color="white")),
     xaxis=dict(title_font=dict(size=18, color="white"), tickfont=dict(size=12, color="white")),
     yaxis=dict(title_font=dict(size=18, color="white"), tickfont=dict(size=12, color="white"))
 )
@@ -313,7 +312,6 @@ st.subheader("HEATMAP DE RECEITA AO LONGO DO TEMPO")
 heatmap_df = df_filtered.pivot_table(values='RECEITA', index=df_filtered['Data'].dt.year, columns=df_filtered['Data'].dt.month, aggfunc='sum', fill_value=0)
 fig_heatmap = px.imshow(heatmap_df, labels={'color': 'Receita'}, x=['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
                         y=heatmap_df.index, title='HEATMAP DE RECEITA POR MÊS E ANO', template="plotly_dark", color_continuous_scale=px.colors.sequential.Plasma)
-)
 fig_heatmap.update_layout(
     plot_bgcolor='rgba(0, 0, 0, 0)',
     paper_bgcolor='rgba(0, 0, 0, 0)',
@@ -361,4 +359,5 @@ st.plotly_chart(data1, use_container_width=True)
 # Download de dados originais
 csv = df.to_csv(index=False).encode('utf-8')
 st.download_button('Baixar Dados', data=csv, file_name="Dados.csv", mime='text/csv')
+
 
