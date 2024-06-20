@@ -6,9 +6,9 @@ import warnings
 warnings.filterwarnings('ignore')
 
 # Configuração inicial do Streamlit
-st.set_page_config(page_title="DASHBOARD DE VENDAS", page_icon=":bar_chart:", layout="wide", initial_sidebar_state="expanded")
+st.set_page_config(page_title="Dashboard de Vendas", page_icon=":bar_chart:", layout="wide", initial_sidebar_state="expanded")
 
-st.title(" :bar_chart: DASHBOARD DE VENDAS")
+st.title(" :bar_chart: Dashboard de Vendas")
 st.markdown('<style>div.block-container{padding-top:1rem;}</style>', unsafe_allow_html=True)
 
 # Aplicando tema escuro
@@ -92,21 +92,21 @@ startDate = pd.to_datetime(df["Data"]).min()
 endDate = pd.to_datetime(df["Data"]).max()
 
 with col1:
-    date1 = pd.to_datetime(st.date_input("DATA DE INÍCIO", startDate))
+    date1 = pd.to_datetime(st.date_input("Data de Início", startDate))
 
 with col2:
-    date2 = pd.to_datetime(st.date_input("DATA DE FIM", endDate))
+    date2 = pd.to_datetime(st.date_input("Data de Fim", endDate))
 
 df = df[(df["Data"] >= date1) & (df["Data"] <= date2)].copy()
 
 # Filtros laterais
-st.sidebar.header("ESCOLHA SEUS FILTROS:")
-clientes = st.sidebar.multiselect("ESCOLHA O CLIENTE", df["CLIENTE"].unique())
-anos = st.sidebar.multiselect("ESCOLHA O ANO", df["Ano"].unique())
-meses = st.sidebar.multiselect("ESCOLHA O MÊS", df["Mês"].unique())
-classificacoes = st.sidebar.multiselect("ESCOLHA A CLASSIFICAÇÃO", df["Classificação"].unique())
-perfis = st.sidebar.multiselect("ESCOLHA O PERFIL CLIENTE", df["Perfil Cliente"].unique())
-faixas_peso = st.sidebar.multiselect("ESCOLHA A FAIXA DE PESO", df['Faixa de Peso'].unique())
+st.sidebar.header("Escolha seus filtros:")
+clientes = st.sidebar.multiselect("Escolha o cliente", df["CLIENTE"].unique())
+anos = st.sidebar.multiselect("Escolha o ano", df["Ano"].unique())
+meses = st.sidebar.multiselect("Escolha o mês", df["Mês"].unique())
+classificacoes = st.sidebar.multiselect("Escolha a classificação", df["Classificação"].unique())
+perfis = st.sidebar.multiselect("Escolha o perfil cliente", df["Perfil Cliente"].unique())
+faixas_peso = st.sidebar.multiselect("Escolha a faixa de peso", df['Faixa de Peso'].unique())
 
 # Aplicação dos filtros
 df_filtered = df.copy()
@@ -124,24 +124,23 @@ if faixas_peso:
     df_filtered = df_filtered[df_filtered['Faixa de Peso'].isin(faixas_peso)]
 
 # KPIs
+st.markdown("## KPIs")
+kpi1, kpi2, kpi3 = st.columns(3)
 total_revenue = df_filtered['RECEITA'].sum()
 total_weight = df_filtered['PESO'].sum()
 total_customers = df_filtered['CLIENTE'].nunique()
-
-st.markdown("### KPIS")
-kpi1, kpi2, kpi3 = st.columns(3)
-kpi1.metric(label="RECEITA TOTAL", value=f"R$ {total_revenue:,.2f}")
-kpi2.metric(label="PESO TOTAL TRANSPORTADO", value=f"{total_weight:,.2f} kg")
-kpi3.metric(label="TOTAL DE CLIENTES", value=total_customers)
+kpi1.metric(label="Receita total", value=f"R$ {total_revenue:,.2f}")
+kpi2.metric(label="Peso total transportado", value=f"{total_weight:,.2f} kg")
+kpi3.metric(label="Total de clientes", value=total_customers)
 
 # Gráficos de crescimento do faturamento e participação
-st.markdown("### GRÁFICOS DE CRESCIMENTO DO FATURAMENTO E PARTICIPAÇÃO")
+st.markdown("## Crescimento do faturamento e participação")
 
 # Cálculo do crescimento do faturamento por ano
 annual_revenue = df_filtered.groupby('Ano')['RECEITA'].sum().reset_index()
 
 # Gráfico de linha para crescimento do faturamento
-fig_growth = px.line(annual_revenue, x='Ano', y='RECEITA', markers=True, title='Crescimento do Faturamento por Ano',
+fig_growth = px.line(annual_revenue, x='Ano', y='RECEITA', markers=True, title='Crescimento do faturamento por ano',
                      labels={'RECEITA': 'Faturamento (R$)'}, template="plotly_dark", color_discrete_sequence=px.colors.sequential.Plasma)
 fig_growth.update_layout(
     plot_bgcolor='rgba(0, 0, 0, 0)',
@@ -154,7 +153,7 @@ fig_growth.update_layout(
 st.plotly_chart(fig_growth, use_container_width=True)
 
 # Gráfico de pizza para participação de cada ano na receita total
-fig_pie = px.pie(annual_revenue, values='RECEITA', names='Ano', title='Participação na Receita Total por Ano',
+fig_pie = px.pie(annual_revenue, values='RECEITA', names='Ano', title='Participação na receita total por ano',
                  template="plotly_dark", color_discrete_sequence=px.colors.sequential.Plasma)
 fig_pie.update_layout(
     plot_bgcolor='rgba(0, 0, 0, 0)',
@@ -165,19 +164,21 @@ fig_pie.update_layout(
 )
 st.plotly_chart(fig_pie, use_container_width=True)
 
-# Gráficos e tabelas
+# Análise de receita por classificação e cliente
+st.markdown("## Análise de receita por classificação e cliente")
+
 col1, col2 = st.columns((2))
 
 # Gráfico de receita por classificação de cliente
 with col1:
-    st.subheader("RECEITA POR CLASSIFICAÇÃO DE CLIENTE")
+    st.subheader("Receita por classificação de cliente")
     classificacao_df = df_filtered.groupby(by=["Classificação"], as_index=False)["RECEITA"].sum()
     fig = px.bar(classificacao_df, x="Classificação", y="RECEITA", text=classificacao_df["RECEITA"].apply(lambda x: f'R$ {x:,.2f}'),
                  template="plotly_dark", color_discrete_sequence=px.colors.sequential.Plasma)
     fig.update_layout(
-        title="RECEITA POR CLASSIFICAÇÃO DE CLIENTE",
-        xaxis_title="CLASSIFICAÇÃO",
-        yaxis_title="RECEITA (R$)",
+        title="Receita por classificação de cliente",
+        xaxis_title="Classificação",
+        yaxis_title="Receita (R$)",
         plot_bgcolor='rgba(0, 0, 0, 0)',
         paper_bgcolor='rgba(0, 0, 0, 0)',
         font=dict(color="white"),
@@ -189,11 +190,11 @@ with col1:
 
 # Gráfico de receita por cliente
 with col2:
-    st.subheader("RECEITA POR CLIENTE")
+    st.subheader("Receita por cliente")
     cliente_df = df_filtered.groupby(by=["CLIENTE"], as_index=False)["RECEITA"].sum().nlargest(10, 'RECEITA')
     fig = px.pie(cliente_df, values="RECEITA", names="CLIENTE", hole=0.5, template="plotly_dark", color_discrete_sequence=px.colors.sequential.Plasma)
     fig.update_layout(
-        title="RECEITA POR CLIENTE",
+        title="Receita por cliente",
         plot_bgcolor='rgba(0, 0, 0, 0)',
         paper_bgcolor='rgba(0, 0, 0, 0)',
         font=dict(color="white"),
@@ -202,36 +203,21 @@ with col2:
     )
     st.plotly_chart(fig, use_container_width=True)
 
-# Top Clientes por Receita
-st.subheader("TOP CLIENTES POR RECEITA")
-top_clients = df_filtered.groupby('CLIENTE')['RECEITA'].sum().reset_index().sort_values(by='RECEITA', ascending=False).head(10)
-fig = px.bar(top_clients, x='CLIENTE', y='RECEITA', text=top_clients["RECEITA"].apply(lambda x: f'R$ {x:,.2f}'),
-             template="plotly_dark", color_discrete_sequence=px.colors.sequential.Plasma)
-fig.update_layout(
-    title="TOP CLIENTES POR RECEITA",
-    xaxis_title="CLIENTE",
-    yaxis_title="RECEITA (R$)",
-    plot_bgcolor='rgba(0, 0, 0, 0)',
-    paper_bgcolor='rgba(0, 0, 0, 0)',
-    font=dict(color="white"),
-    title_font=dict(size=24, color="white"),
-    xaxis=dict(title_font=dict(size=18, color="white"), tickfont=dict(size=12, color="white")),
-    yaxis=dict(title_font=dict(size=18, color="white"), tickfont=dict(size=12, color="white"))
-)
-st.plotly_chart(fig, use_container_width=True)
+# Análise comparativa e distribuições
+st.markdown("## Análise comparativa e distribuições")
 
-# Comparar receita entre diferentes períodos
-st.subheader("COMPARAR RECEITA ENTRE DIFERENTES PERÍODOS")
+# Comparação de Receita entre diferentes períodos
+st.subheader("Comparar receita entre diferentes períodos")
 
 # Seleção de períodos
 col1, col2 = st.columns(2)
 with col1:
-    period1_start = st.date_input("DATA DE INÍCIO DO PERÍODO 1", value=pd.to_datetime("2023-01-01"))
-    period1_end = st.date_input("DATA DE FIM DO PERÍODO 1", value=pd.to_datetime("2023-12-31"))
+    period1_start = st.date_input("Data de início do período 1", value=pd.to_datetime("2023-01-01"))
+    period1_end = st.date_input("Data de fim do período 1", value=pd.to_datetime("2023-12-31"))
 
 with col2:
-    period2_start = st.date_input("DATA DE INÍCIO DO PERÍODO 2", value=pd.to_datetime("2024-01-01"))
-    period2_end = st.date_input("DATA DE FIM DO PERÍODO 2", value=pd.to_datetime("2024-12-31"))
+    period2_start = st.date_input("Data de início do período 2", value=pd.to_datetime("2024-01-01"))
+    period2_end = st.date_input("Data de fim do período 2", value=pd.to_datetime("2024-12-31"))
 
 # Filtragem dos dados para os períodos selecionados
 period1_df = df[(df["Data"] >= pd.to_datetime(period1_start)) & (df["Data"] <= pd.to_datetime(period1_end))]
@@ -248,7 +234,7 @@ comparison_df = pd.DataFrame({
 })
 
 fig_comparison = px.bar(comparison_df, x="Período", y="Receita", text=comparison_df["Receita"].apply(lambda x: f'R$ {x:,.2f}'),
-                        title="COMPARAÇÃO DE RECEITA ENTRE PERÍODOS", labels={"Receita": "RECEITA TOTAL"}, template="plotly_dark", color_discrete_sequence=px.colors.sequential.Plasma)
+                        title="Comparação de receita entre períodos", labels={"Receita": "Receita total"}, template="plotly_dark", color_discrete_sequence=px.colors.sequential.Plasma)
 fig_comparison.update_layout(
     plot_bgcolor='rgba(0, 0, 0, 0)',
     paper_bgcolor='rgba(0, 0, 0, 0)',
@@ -259,11 +245,11 @@ fig_comparison.update_layout(
 )
 st.plotly_chart(fig_comparison, use_container_width=True)
 
-# Análise de Crescimento Mensal
-st.subheader('ANÁLISE DE CRESCIMENTO MENSAL DA RECEITA')
+# Análise de crescimento mensal
+st.subheader('Análise de crescimento mensal da receita')
 growth_df = df_filtered.groupby(df_filtered['Data'].dt.to_period('M'))['RECEITA'].sum().reset_index()
 growth_df['Data'] = growth_df['Data'].astype(str)  # Convertendo para string
-fig = px.line(growth_df, x='Data', y='RECEITA', title='CRESCIMENTO MENSAL DA RECEITA', template="plotly_dark", color_discrete_sequence=px.colors.sequential.Plasma)
+fig = px.line(growth_df, x='Data', y='RECEITA', title='Crescimento mensal da receita', template="plotly_dark", color_discrete_sequence=px.colors.sequential.Plasma)
 fig.update_layout(
     plot_bgcolor='rgba(0, 0, 0, 0)',
     paper_bgcolor='rgba(0, 0, 0, 0)',
@@ -274,12 +260,12 @@ fig.update_layout(
 )
 st.plotly_chart(fig, use_container_width=True)
 
-# Comparação de Receita e Peso Transportado
-st.subheader("COMPARAÇÃO DE RECEITA E PESO TRANSPORTADO")
+# Comparação de receita e peso transportado
+st.subheader("Comparação de receita e peso transportado")
 comparison_df = df_filtered.groupby(by=["Ano", "Mês"], as_index=False).agg({"RECEITA": "sum", "PESO": "sum"})
 comparison_df = comparison_df.sort_values(by=["Ano", "Mês"])
 fig = px.bar(comparison_df, x="Mês", y=["RECEITA", "PESO"], barmode="group", facet_col="Ano",
-             labels={"value": "VALOR", "variable": "MÉTRICA"}, title="COMPARAÇÃO DE RECEITA E PESO TRANSPORTADO POR MÊS E ANO", template="plotly_dark", color_discrete_sequence=px.colors.sequential.Plasma)
+             labels={"value": "Valor", "variable": "Métrica"}, title="Comparação de receita e peso transportado por mês e ano", template="plotly_dark", color_discrete_sequence=px.colors.sequential.Plasma)
 fig.update_layout(
     plot_bgcolor='rgba(0, 0, 0, 0)',
     paper_bgcolor='rgba(0, 0, 0, 0)',
@@ -290,11 +276,11 @@ fig.update_layout(
 )
 st.plotly_chart(fig, use_container_width=True)
 
-# Distribuição da Receita por Faixa de Peso
-st.subheader("DISTRIBUIÇÃO DA RECEITA POR FAIXA DE PESO")
+# Distribuição da receita por faixa de peso
+st.subheader("Distribuição da receita por faixa de peso")
 faixa_peso_df = df_filtered.groupby(by=["Faixa de Peso"], as_index=False)["RECEITA"].sum()
 fig = px.bar(faixa_peso_df, x="Faixa de Peso", y="RECEITA", text=faixa_peso_df["RECEITA"].apply(lambda x: f'R$ {x:,.2f}'),
-             title="DISTRIBUIÇÃO DA RECEITA POR FAIXA DE PESO", template="plotly_dark", color_discrete_sequence=px.colors.sequential.Plasma)
+             title="Distribuição da receita por faixa de peso", template="plotly_dark", color_discrete_sequence=px.colors.sequential.Plasma)
 fig.update_layout(
     plot_bgcolor='rgba(0, 0, 0, 0)',
     paper_bgcolor='rgba(0, 0, 0, 0)',
@@ -305,12 +291,12 @@ fig.update_layout(
 )
 st.plotly_chart(fig, use_container_width=True)
 
-# Análise de Receita por Perfil de Cliente
-st.subheader("RECEITA POR PERFIL DE CLIENTE")
-perfil_df = df_filtered.groupby(by["Perfil Cliente"], as_index=False)["RECEITA"].sum()
+# Análise de receita por perfil de cliente
+st.subheader("Receita por perfil de cliente")
+perfil_df = df_filtered.groupby(by=["Perfil Cliente"], as_index=False)["RECEITA"].sum()
 fig = px.pie(perfil_df, values="RECEITA", names="Perfil Cliente", hole=0.5, template="plotly_dark", color_discrete_sequence=px.colors.sequential.Plasma)
 fig.update_layout(
-    title="RECEITA POR PERFIL DE CLIENTE",
+    title="Receita por perfil de cliente",
     plot_bgcolor='rgba(0, 0, 0, 0)',
     paper_bgcolor='rgba(0, 0, 0, 0)',
     font=dict(color="white"),
@@ -320,11 +306,11 @@ fig.update_layout(
 fig.update_traces(text=perfil_df["Perfil Cliente"], textposition="outside")
 st.plotly_chart(fig, use_container_width=True)
 
-# Heatmap de Receita
-st.subheader("HEATMAP DE RECEITA AO LONGO DO TEMPO")
+# Heatmap de receita
+st.subheader("Heatmap de receita ao longo do tempo")
 heatmap_df = df_filtered.pivot_table(values='RECEITA', index=df_filtered['Data'].dt.year, columns=df_filtered['Data'].dt.month, aggfunc='sum', fill_value=0)
 fig_heatmap = px.imshow(heatmap_df, labels={'color': 'Receita'}, x=['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-                        y=heatmap_df.index, title='HEATMAP DE RECEITA POR MÊS E ANO', template="plotly_dark", color_continuous_scale=px.colors.sequential.Plasma)
+                        y=heatmap_df.index, title='Heatmap de receita por mês e ano', template="plotly_dark", color_continuous_scale=px.colors.sequential.Plasma)
 fig_heatmap.update_layout(
     plot_bgcolor='rgba(0, 0, 0, 0)',
     paper_bgcolor='rgba(0, 0, 0, 0)',
@@ -336,7 +322,7 @@ fig_heatmap.update_layout(
 st.plotly_chart(fig_heatmap, use_container_width=True)
 
 # Análise de séries temporais
-st.subheader('ANÁLISE DE SÉRIES TEMPORAIS')
+st.subheader('Análise de séries temporais')
 linechart = pd.DataFrame(df_filtered.groupby(df_filtered["month_year"].dt.strftime("%Y-%b"))["RECEITA"].sum()).reset_index()
 fig2 = px.line(linechart, x="month_year", y="RECEITA", labels={"RECEITA": "Valor"}, height=500, width=1000, template="plotly_dark", color_discrete_sequence=px.colors.sequential.Plasma)
 fig2.update_layout(
@@ -349,16 +335,16 @@ fig2.update_layout(
 )
 st.plotly_chart(fig2, use_container_width=True)
 
-with st.expander("DADOS DE SÉRIES TEMPORAIS"):
+with st.expander("Dados de séries temporais"):
     st.write(linechart.T.style.background_gradient(cmap="plasma"))
     csv = linechart.to_csv(index=False).encode("utf-8")
-    st.download_button('Baixar Dados', data=csv, file_name="TimeSeries.csv", mime='text/csv')
+    st.download_button('Baixar dados', data=csv, file_name="TimeSeries.csv", mime='text/csv')
 
 # Gráfico de dispersão
-st.subheader("RELAÇÃO ENTRE RECEITA E PESO USANDO SCATTER PLOT")
+st.subheader("Relação entre receita e peso usando scatter plot")
 data1 = px.scatter(df_filtered, x="RECEITA", y="PESO", size="PESO", 
                    labels={"RECEITA": "Receita", "PESO": "Peso"},
-                   title="RELAÇÃO ENTRE RECEITA E PESO", template="plotly_dark", color_discrete_sequence=px.colors.sequential.Plasma)
+                   title="Relação entre receita e peso", template="plotly_dark", color_discrete_sequence=px.colors.sequential.Plasma)
 data1.update_layout(
     plot_bgcolor='rgba(0, 0, 0, 0)',
     paper_bgcolor='rgba(0, 0, 0, 0)',
@@ -371,6 +357,7 @@ st.plotly_chart(data1, use_container_width=True)
 
 # Download de dados originais
 csv = df.to_csv(index=False).encode('utf-8')
-st.download_button('Baixar Dados', data=csv, file_name="Dados.csv", mime='text/csv')
+st.download_button('Baixar dados', data=csv, file_name="Dados.csv", mime='text/csv')
+
 
 
