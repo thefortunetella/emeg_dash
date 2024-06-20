@@ -135,7 +135,7 @@ kpi2.metric(label="PESO TOTAL TRANSPORTADO", value=f"{total_weight:,.2f} kg")
 kpi3.metric(label="TOTAL DE CLIENTES", value=total_customers)
 
 # KPIs adicionais
-st.markdown("### KPIS ADICIONAIS")
+
 col1, col2, col3 = st.columns(3)
 
 # Variação percentual da receita
