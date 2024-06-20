@@ -173,12 +173,12 @@ with col1:
         xaxis=dict(title_font=dict(size=18, color="white"), tickfont=dict(size=12, color="white")),
         yaxis=dict(title_font=dict(size=18, color="white"), tickfont=dict(size=12, color="white"))
     )
-    st.plotly_chart(fig, use_container_width=True, height=200)
+    st.plotly_chart(fig, use_container_width=True)
 
 # Gráfico de receita por cliente
 with col2:
     st.subheader("RECEITA POR CLIENTE")
-    cliente_df = df_filtered.groupby(by["CLIENTE"], as_index=False)["RECEITA"].sum().nlargest(10, 'RECEITA')
+    cliente_df = df_filtered.groupby(by=["CLIENTE"], as_index=False)["RECEITA"].sum().nlargest(10, 'RECEITA')
     fig = px.pie(cliente_df, values="RECEITA", names="CLIENTE", hole=0.5, template="plotly_dark", color_discrete_sequence=px.colors.sequential.Plasma)
     fig.update_layout(
         title="RECEITA POR CLIENTE",
@@ -312,7 +312,7 @@ st.plotly_chart(fig, use_container_width=True)
 st.subheader("HEATMAP DE RECEITA AO LONGO DO TEMPO")
 heatmap_df = df_filtered.pivot_table(values='RECEITA', index=df_filtered['Data'].dt.year, columns=df_filtered['Data'].dt.month, aggfunc='sum', fill_value=0)
 fig_heatmap = px.imshow(heatmap_df, labels={'color': 'Receita'}, x=['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-                        y=heatmap_df.index, title='HEATMAP DE RECEITA POR MÊS E ANO', template="plotly_dark", color_continuous_scale=px.colors.sequential.Plasma)
+                        y=heatmap_df.index, title='HEATMAP DE RECEITA POR MÊS E ANO', template="plotly_dark", color_continuous_scale=px.colors.sequential.Plasma
 fig_heatmap.update_layout(
     plot_bgcolor='rgba(0, 0, 0, 0)',
     paper_bgcolor='rgba(0, 0, 0, 0)',
@@ -344,8 +344,8 @@ with st.expander("DADOS DE SÉRIES TEMPORAIS"):
 
 # Gráfico de dispersão
 st.subheader("RELAÇÃO ENTRE RECEITA E PESO USANDO SCATTER PLOT")
-data1 = px.scatter(df_filtered, x="RECEITA", y="PESO", size="Total de Compras", 
-                   labels={"RECEITA": "Receita", "PESO": "Peso", "Total de Compras": "Compras"},
+data1 = px.scatter(df_filtered, x="RECEITA", y="PESO", size="PESO", 
+                   labels={"RECEITA": "Receita", "PESO": "Peso"},
                    title="RELAÇÃO ENTRE RECEITA E PESO", template="plotly_dark", color_discrete_sequence=px.colors.sequential.Plasma)
 data1.update_layout(
     plot_bgcolor='rgba(0, 0, 0, 0)',
@@ -360,4 +360,5 @@ st.plotly_chart(data1, use_container_width=True)
 # Download de dados originais
 csv = df.to_csv(index=False).encode('utf-8')
 st.download_button('Baixar Dados', data=csv, file_name="Dados.csv", mime='text/csv')
+
 
