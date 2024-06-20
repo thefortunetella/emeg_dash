@@ -134,11 +134,6 @@ kpi1.metric(label="RECEITA TOTAL", value=f"R$ {total_revenue:,.2f}")
 kpi2.metric(label="PESO TOTAL TRANSPORTADO", value=f"{total_weight:,.2f} kg")
 kpi3.metric(label="TOTAL DE CLIENTES", value=total_customers)
 
-# Média de Peso por Transporte
-avg_weight_per_transport = df_filtered['PESO'].mean()
-col2.metric(label="MÉDIA DE PESO POR TRANSPORTE", value=f"{avg_weight_per_transport:.2f} kg")
-
-
 # Gráficos e tabelas
 col1, col2 = st.columns((2))
 
