@@ -139,7 +139,7 @@ st.markdown("### KPIS ADICIONAIS")
 col1, col2, col3 = st.columns(3)
 
 # Variação percentual da receita anual
-annual_revenue_variation = df_filtered.groupby('Ano')['RECEITA'].sum().pct_change().fillna(0).mean() * 100
+annual_revenue_variation = df_filtered.groupby('Ano')['RECEITA'].sum().pct_change().fillna(0).iloc[-1] * 100
 col1.metric(label="VARIAÇÃO PERCENTUAL DA RECEITA", value=f"{annual_revenue_variation:.2f}%")
 
 # Média de Peso por Transporte
@@ -240,6 +240,8 @@ fig_comparison.update_layout(
     paper_bgcolor='rgba(0, 0, 0, 0)',
     font=dict(color="white"),
     title_font=dict(size=24, color="white"),
+    xaxis=dict
+        title_font=dict(size=24, color="white")),
     xaxis=dict(title_font=dict(size=18, color="white"), tickfont=dict(size=12, color="white")),
     yaxis=dict(title_font=dict(size=18, color="white"), tickfont=dict(size=12, color="white"))
 )
@@ -358,7 +360,4 @@ st.plotly_chart(data1, use_container_width=True)
 # Download de dados originais
 csv = df.to_csv(index=False).encode('utf-8')
 st.download_button('Baixar Dados', data=csv, file_name="Dados.csv", mime='text/csv')
-
-
-
 
