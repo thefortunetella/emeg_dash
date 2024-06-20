@@ -139,12 +139,10 @@ st.markdown("### GRÁFICOS DE CRESCIMENTO DO FATURAMENTO E PARTICIPAÇÃO")
 
 # Cálculo do crescimento do faturamento por ano
 annual_revenue = df_filtered.groupby('Ano')['RECEITA'].sum().reset_index()
-annual_revenue['Crescimento'] = annual_revenue['RECEITA'].pct_change().fillna(0) * 100
 
-# Gráfico de barras para crescimento do faturamento
-fig_growth = px.bar(annual_revenue, x='Ano', y='Crescimento', text=annual_revenue['Crescimento'].apply(lambda x: f'{x:.2f}%'),
-                    title='Crescimento do Faturamento por Ano', labels={'Crescimento': 'Crescimento (%)'},
-                    template="plotly_dark", color_discrete_sequence=px.colors.sequential.Plasma)
+# Gráfico de linha para crescimento do faturamento
+fig_growth = px.line(annual_revenue, x='Ano', y='RECEITA', markers=True, title='Crescimento do Faturamento por Ano',
+                     labels={'RECEITA': 'Faturamento (R$)'}, template="plotly_dark", color_discrete_sequence=px.colors.sequential.Plasma)
 fig_growth.update_layout(
     plot_bgcolor='rgba(0, 0, 0, 0)',
     paper_bgcolor='rgba(0, 0, 0, 0)',
@@ -309,7 +307,7 @@ st.plotly_chart(fig, use_container_width=True)
 
 # Análise de Receita por Perfil de Cliente
 st.subheader("RECEITA POR PERFIL DE CLIENTE")
-perfil_df = df_filtered.groupby(by=["Perfil Cliente"], as_index=False)["RECEITA"].sum()
+perfil_df = df_filtered.groupby(by["Perfil Cliente"], as_index=False)["RECEITA"].sum()
 fig = px.pie(perfil_df, values="RECEITA", names="Perfil Cliente", hole=0.5, template="plotly_dark", color_discrete_sequence=px.colors.sequential.Plasma)
 fig.update_layout(
     title="RECEITA POR PERFIL DE CLIENTE",
