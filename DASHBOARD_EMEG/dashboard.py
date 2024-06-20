@@ -134,23 +134,10 @@ kpi1.metric(label="RECEITA TOTAL", value=f"R$ {total_revenue:,.2f}")
 kpi2.metric(label="PESO TOTAL TRANSPORTADO", value=f"{total_weight:,.2f} kg")
 kpi3.metric(label="TOTAL DE CLIENTES", value=total_customers)
 
-# KPIs adicionais
-st.markdown("### KPIS ADICIONAIS")
-col1, col2, col3 = st.columns(3)
-
-# Variação percentual da receita anual
-annual_revenue = df_filtered.groupby('Ano')['RECEITA'].sum()
-annual_revenue_variation = annual_revenue.pct_change().fillna(0).iloc[-1] * 100
-col1.metric(label="VARIAÇÃO PERCENTUAL DA RECEITA", value=f"{annual_revenue_variation:.2f}%")
-
 # Média de Peso por Transporte
 avg_weight_per_transport = df_filtered['PESO'].mean()
 col2.metric(label="MÉDIA DE PESO POR TRANSPORTE", value=f"{avg_weight_per_transport:.2f} kg")
 
-# Porcentagem de clientes retidos ao longo dos anos
-frequent_customers = df_filtered[df_filtered['Perfil Cliente'] == 'Frequente']['CLIENTE'].nunique()
-retained_customers_percentage = (frequent_customers / df_filtered['CLIENTE'].nunique()) * 100
-col3.metric(label="PORCENTAGEM DE CLIENTES RETIDOS", value=f"{retained_customers_percentage:.2f}%")
 
 # Gráficos e tabelas
 col1, col2 = st.columns((2))
