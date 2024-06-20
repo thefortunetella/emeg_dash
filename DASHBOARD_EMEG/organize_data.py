@@ -29,7 +29,7 @@ df.fillna({'RECEITA': 0, 'PESO': 0}, inplace=True)
 # Verificar se há valores duplicados e removê-los
 df.drop_duplicates(inplace=True)
 
-# Adicionar colunas de semestre
+# Adicionar colunas de data e semestre
 df['Data'] = pd.to_datetime(df['Ano'].astype(str) + '-' + df['Mês'].astype(str), format='%Y-%B', errors='coerce')
 df['Semestre'] = df['Data'].dt.to_period('6M')
 
@@ -61,7 +61,13 @@ df = df.merge(peso_total_cliente, on='CLIENTE', how='left')
 purchase_counts = df['CLIENTE'].value_counts()
 df['Perfil Cliente'] = df['CLIENTE'].map(lambda x: 'Frequente' if purchase_counts[x] > 20 else 'Único' if purchase_counts[x] == 1 else 'Sazonal')
 
+# Variação Percentual da Receita Anual
+receita_anual = df.groupby('Ano')['RECEITA'].sum().reset_index()
+receita_anual['Variação Receita'] = receita_anual['RECEITA'].pct_change() * 100
+df = df.merge(receita_anual[['Ano', 'Variação Receita']], on='Ano', how='left')
+
+# Identificação de Clientes Retidos
+df['Cliente Retido'] = df['Perfil Cliente'].apply(lambda x: 1 if x == 'Frequente' else 0)
+
 # Salvar dados tratados em um novo arquivo CSV
 df.to_csv('data_tratado.csv', index=False, sep=';', encoding='latin1')
-
-
