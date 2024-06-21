@@ -1,21 +1,10 @@
-
-Este projeto é um dashboard de vendas interativo desenvolvido com Streamlit e Plotly. O dashboard permite carregar, filtrar e visualizar dados de vendas de forma dinâmica, proporcionando uma análise detalhada de vários aspectos do desempenho de vendas.
 ```
+Este projeto é um dashboard de vendas interativo desenvolvido com Streamlit e Plotly. O dashboard permite carregar, filtrar e visualizar dados de vendas de forma dinâmica, proporcionando uma análise detalhada de vários aspectos do desempenho de vendas.
 ```
 ## Como Usar
 
-1. **Instale as Dependências**:
-   Certifique-se de ter o Python instalado em sua máquina. Instale as dependências necessárias usando o seguinte comando:
-   ```bash
-   pip install streamlit plotly pandas
-   ```
-
-2. **Execute o Dashboard**:
-   Salve o código do dashboard em um arquivo chamado `dashboard.py` e execute-o usando o seguinte comando:
-   ```bash
-   streamlit run dashboard.py
-   ```
-
+1. **Baixe o arquivo data_tratado.csv**:
+   
 3. **Carregue os Dados**:
    - Clique no botão de upload e selecione seu arquivo de dados (CSV, TXT, XLSX ou XLS).
    - Aguarde até que os dados sejam carregados e processados.
